@@ -1,0 +1,73 @@
+# Gather ETH链数据采集系统配置文件
+
+# 区块链节点配置
+blockchain:
+  nodes:
+    - name: "infura"
+      url: "https://mainnet.infura.io/v3/YOUR_INFURA_API_KEY"
+      type: "infura"
+      rate_limit: 100
+      priority: 1
+    
+    - name: "alchemy"
+      url: "https://eth-mainnet.alchemyapi.io/v2/YOUR_ALCHEMY_API_KEY"
+      type: "alchemy"
+      rate_limit: 100
+      priority: 2
+
+    - name: "quicknode"
+      url: "https://YOUR_ENDPOINT.quiknode.pro/YOUR_API_KEY/"
+      type: "quicknode"
+      rate_limit: 100
+      priority: 3
+
+# 采集器配置
+collector:
+  workers: 10          # 工作协程数
+  batch_size: 100      # 批次大小
+  retry_limit: 3       # 重试次数
+  timeout: "30s"       # 超时时间
+
+# 输出配置
+output:
+  format: "kafka_async"    # 输出格式: json, json_async, kafka, kafka_async
+  directory: "./outputs"   # 输出目录
+  compress: false          # 是否压缩
+  kafka:                   # Kafka输出配置
+    brokers:
+      - "localhost:9092"
+    topics:
+      blocks: "blockchain_blocks"
+      transactions: "blockchain_transactions"
+      logs: "blockchain_logs"
+      internal_transactions: "blockchain_internal_transactions"
+      state_changes: "blockchain_state_changes"
+      contract_creations: "blockchain_contract_creations"
+      reorg_notifications: "blockchain_reorg_notifications"
+      withdrawals: "blockchain_withdrawals"
+
+# 解码器配置
+decoder:
+  fourbyte_api_url: "https://www.4byte.directory/api/v1/signatures/"
+  api_timeout: "5s"
+  enable_cache: true
+  cache_size: 10000
+  enable_api: true         # 是否启用API查询
+
+# 日志配置
+logging:
+  level: "info"            # 日志级别: debug, info, warn, error
+  format: "json"           # 日志格式: json, text
+  output: "stdout"         # 输出: stdout, stderr, file
+  rotation: false          # 是否启用日志轮转
+  max_size: 100            # 最大文件大小(MB)
+  max_age: 30              # 保留天数
+  max_backups: 3           # 备份文件数
+  compress: true           # 是否压缩旧日志
+
+# 数据库配置（可选，用于动态配置管理）
+database:
+  enabled: false           # 是否启用数据库配置
+  dsn: ""                  # 数据库连接字符串
+  # PostgreSQL 示例: "postgres://user:password@localhost:5432/gather_config?sslmode=disable"  
+  # MySQL 示例: "user:password@tcp(localhost:3306)/gather_config?charset=utf8mb4&parseTime=True"

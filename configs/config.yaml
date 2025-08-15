@@ -1,0 +1,47 @@
+# Gather ETH链数据采集系统配置文件
+
+# 区块链节点配置
+blockchain:
+  nodes:
+    - name: "local_node"
+      url: "http://localhost"
+      type: "local"
+      rate_limit: 1000
+      priority: 1
+    
+    - name: "infura"
+      url: "https://mainnet.infura.io/v3/xxx"
+      type: "infura"
+      rate_limit: 100
+      priority: 2
+    
+    - name: "alchemy"
+      url: "https://eth-mainnet.alchemyapi.io/v2/xxx"
+      type: "alchemy"
+      rate_limit: 100
+      priority: 3
+
+# 采集器配置
+collector:
+  workers: 10          # 工作协程数
+  batch_size: 100      # 批次大小
+  retry_limit: 3       # 重试次数
+  timeout: "30s"       # 超时时间
+  enable_trace: true   # 是否启用交易追踪（需要节点支持debug_traceTransaction）
+  enable_state_tracking: true  # 是否启用状态变更追踪
+
+# 输出配置
+output:
+  format: "kafka"      # 输出格式: json, csv, kafka
+  directory: "./outputs"  # 输出目录
+  compress: false      # 是否压缩
+  kafka:
+    brokers: ["localhost:9092"]  # Kafka服务器地址
+    topics:
+      blocks: "blockchain_blocks"
+      transactions: "blockchain_transactions"
+      logs: "blockchain_logs"
+      internal_transactions: "blockchain_internal_transactions"
+      state_changes: "blockchain_state_changes"
+      contract_creations: "blockchain_contract_creations"
+      withdrawals: "blockchain_withdrawals"  # 新增：提款数据topic 
